@@ -33,7 +33,7 @@ public class DiscordFabricLinkConfig implements ConfigData {
     public String minecraftChatFormat = "<%s> %s";
 
     @Comment("UUID face API")
-    public String uuidFaceApi = "https://crafatar.com/avatars/%s";
+    public String uuidFaceApi = "https://crafatar.com/avatars/%s?overlay&size=128";
 
     public static void initialize() {
         AutoConfig.register(DiscordFabricLinkConfig.class, JanksonConfigSerializer::new);
