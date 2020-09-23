@@ -11,12 +11,12 @@ public class ChatToDiscordThread extends Thread {
 
     @Override
     public void run() {
-        while (true) {
-            try {
+        try {
+            while (true) {
                 blockingQueue.take().send();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
