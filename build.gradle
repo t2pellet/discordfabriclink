@@ -27,7 +27,11 @@ configurations {
 // Relocating a Package
 shadowJar {
     configurations = [project.configurations.shade]
-    relocate 'io.netty', 'shaded.io.netty'
+    relocate 'io.netty', 'discordfabriclink.shaded.io.netty'
+
+    // Compatibility with Gunpowder
+    relocate 'com.fasterxml.jackson', 'discordfabriclink.shaded.com.fasterxml.jackson'
+    relocate 'org.slf4j', 'discordfabriclink.shaded.org.slf4j'
 }
 
 dependencies {
