@@ -57,7 +57,8 @@ public class DiscordFabricLink implements DedicatedServerModInitializer {
             chatToDiscordThread.addMessage(new DiscordMessage(Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId), "Server stopping"));
         });
         ServerLifecycleEvents.SERVER_STOPPED.register(minecraftServer -> {
-            chatToDiscordThread.addMessage(new DiscordMessage(Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId), "Server stopped"));
+            // Don't use the separate thread to send this message, Otherwise the message won't get sent.
+            new DiscordMessage(Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId), "Server stopped").send();
             client.logout().subscribe();
             chatToDiscordThread.interrupt();
         });
