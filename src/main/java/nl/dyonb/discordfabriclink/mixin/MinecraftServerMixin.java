@@ -38,14 +38,7 @@ public abstract class MinecraftServerMixin {
                 if (key.startsWith(publicKey)) {
                     String discordMessage = message.getString();
 
-                    if (key.startsWith("chat.type.text")) {
-                        // The most horrible hacky stuff you have ever seen
-                        String name = ((LiteralText) ((TranslatableText) message).getArgs()[0]).asString();
-                        String actualMessage = ((String) ((TranslatableText) message).getArgs()[1]);
-
-                        DiscordWebhook discordWebhook = new DiscordWebhook(Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId), actualMessage, name, senderUuid);
-                        DiscordFabricLink.chatToDiscordThread.addMessage(discordWebhook);
-                    } else {
+                    if (!key.startsWith("chat.type.text")) {
                         DiscordFabricLink.chatToDiscordThread.addMessage(new DiscordMessage(Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId), discordMessage));
                     }
                 }
