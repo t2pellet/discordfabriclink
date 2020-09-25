@@ -47,6 +47,10 @@ public class DiscordFabricLink implements DedicatedServerModInitializer {
         chatToDiscordThread.start();
         LOGGER.log(Level.INFO, "Discord4J logged in!");
 
+        if (FabricLoader.getInstance().isModLoaded("chathistory")) {
+            LOGGER.log(Level.INFO, "Detected the Chat History mod!");
+        }
+
         // Ignore this c:
         ServerLifecycleEvents.SERVER_STARTING.register(minecraftServer -> {
             this.minecraftServer = minecraftServer;
