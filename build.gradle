@@ -97,6 +97,10 @@ jar {
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            groupId = project.maven_group
+            artifactId = project.archives_base_name
+            version = project.mod_version
+
             // add all the jars that should be included when publishing to maven
             artifact(remapJar) {
                 builtBy remapJar
@@ -109,7 +113,12 @@ publishing {
 
     // select the repositories you want to publish to
     repositories {
-        // uncomment to publish to the local maven
-        // mavenLocal()
+        maven {
+            url "https://nexus.dyonb.nl/repository/maven-releases/"
+            credentials {
+                username System.getenv('MAVEN_USERNAME')
+                password System.getenv('MAVEN_PASSWORD')
+            }
+        }
     }
 }
