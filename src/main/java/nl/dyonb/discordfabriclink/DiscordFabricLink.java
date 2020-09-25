@@ -11,9 +11,11 @@ import discord4j.discordjson.json.WebhookData;
 import discord4j.rest.util.Image;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.MessageType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.LiteralText;
+import nl.dyonb.discordfabriclink.util.ChatHistoryInteraction;
 import nl.dyonb.discordfabriclink.util.DiscordFabricLinkConfig;
 import nl.dyonb.discordfabriclink.util.DiscordMessage;
 import org.apache.logging.log4j.Level;
@@ -108,6 +110,10 @@ public class DiscordFabricLink implements DedicatedServerModInitializer {
                     String formattedString = String.format(DiscordFabricLinkConfig.CONFIG.minecraftChatFormat, message.getAuthor().get().getUsername(), message.getContent());
                     LiteralText literalText = new LiteralText(formattedString);
                     DiscordFabricLink.minecraftServer.getPlayerManager().broadcastChatMessage(literalText, MessageType.CHAT, UUID.randomUUID());
+
+                    if (FabricLoader.getInstance().isModLoaded("chathistory")) {
+                        ChatHistoryInteraction.addMessage(literalText, UUID.randomUUID());
+                    }
                 });
 
         client.onDisconnect();
