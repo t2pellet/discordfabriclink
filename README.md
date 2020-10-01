@@ -3,9 +3,9 @@
 # Discord-Fabric link
 Made possible by dzwdz <3
 
-Discord-Fabric link is a mod that links your Minecraft chat and a discord channel together.
+Discord-Fabric link is a mod that links your Minecraft chat and a Discord channel together.
 
-There are multiple other mods like this, but what makes this one special, is it uses **Discord webhooks** to send player messages, which will display their profile picture and name.
+There are multiple other mods like this, but what makes this one special, is that it uses **Discord webhooks** to send player messages, which will display their profile picture and name.
 
 ## Setup
 First, you need to create a discord bot using the [Discord Developer Portal](https://discord.com/developers)
@@ -93,7 +93,7 @@ Once you copied the token, paste it into the `"discordBotToken": "<--HERE",` sec
 }
 ```
 
-Next, you need to [Enable Developer mode on Discord](https://www.google.com/search?q=how+to+enable+developer+mode+on+discord).
+Next, you need to [Enable Developer mode on Discord](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-).
 Once you've done that, right click on the channel you want the messages to go in (in Discord) and select `Copy ID`.
 Paste this ID into the `"chatChannelId": "<--HERE"` section, so if my channel ID was `123323247436436`, the config file would look like this:
 ```json5
