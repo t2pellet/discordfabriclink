@@ -33,6 +33,7 @@ From here, you can choose a username and icon for your bot!
 Follow the guide at the [FabricMC Website](https://fabricmc.net/) to create a server and put the latest release of this mod (can be obtained from [here](https://github.com/HeyItsMeNobody/discordfabriclink/releases/latest)) in your server `mods` folder.
 
 Next, start up the server, wait for it to fully start, and stop it.
+The mod should generate a config file named `discordfabriclink.json5` inside the `config` folder. It will generate it after you launch the server with the mod installed for the first time.
 
 ### Configuring the mod
 A file called `discordfabriclink.json5` should be created in a directory named `config` in your server folder, and it should look like this:
