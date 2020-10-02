@@ -8,4 +8,4 @@ Discord-Fabric link is a mod that links your Minecraft chat and a Discord channe
 There are multiple other mods like this, but what makes this one special, is that it uses **Discord webhooks** to send player messages, which will display their profile picture and name.
 
 ## Setup
-You can find the [Setup in the wiki.](https://github.com/HeyItsMeNobody/discordfabriclink/wiki/Setup)
+You can find this [here](https://github.com/HeyItsMeNobody/discordfabriclink/wiki/Setup).
