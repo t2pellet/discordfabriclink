@@ -27,8 +27,8 @@ steps:
   - name: generate changelog
     image: naorlivne/drone-github-changelog-generator
     settings:
-      github_user: HeyItsMeNobody
-      github_project: chathistory
+      github_user: kara-b
+      github_project: discordfabriclink
       output_path: CHANGELOG.md
     when:
       event: tag
