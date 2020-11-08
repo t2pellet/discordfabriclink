@@ -21,7 +21,7 @@ public class ServerPlayNetworkHandlerMixin {
 
     @Shadow public ServerPlayerEntity player;
 
-    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V"), method = "onGameMessage")
+    @Inject(at = @At(value = "HEAD", target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V"), method = "onGameMessage")
     public void onGameMessage(ChatMessageC2SPacket packet, CallbackInfo ci) {
         if (Arrays.stream(DiscordFabricLinkConfig.CONFIG.publicKeys).anyMatch("chat.type.text"::equals)) {
             String chatMessage = StringUtils.normalizeSpace(packet.getChatMessage());
