@@ -23,6 +23,9 @@ public class DiscordFabricLinkConfig implements ConfigData {
     @Comment("The message keys that will be sent to the public chat")
     public String[] publicKeys = {"death", "multiplayer", "chat.type.text", "chat.type.advancement", "chat.type.announcement"};
 
+    @Comment("Send admin commands")
+    public boolean sendAdminCommands = false;
+
     @Comment("Log the keys")
     public boolean logKeys = false;
 

@@ -23,7 +23,12 @@ public class ServerPlayNetworkHandlerMixin {
 
     @Inject(at = @At(value = "HEAD", target = "Lnet/minecraft/server/PlayerManager;broadcastChatMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V"), method = "onGameMessage")
     public void onGameMessage(ChatMessageC2SPacket packet, CallbackInfo ci) {
-        if (Arrays.stream(DiscordFabricLinkConfig.CONFIG.publicKeys).anyMatch("chat.type.text"::equals)) {
+        boolean sendMessage = true;
+        if (packet.getChatMessage().startsWith("/") && !DiscordFabricLinkConfig.CONFIG.sendAdminCommands) {
+            sendMessage = false;
+        }
+        
+        if (sendMessage && Arrays.stream(DiscordFabricLinkConfig.CONFIG.publicKeys).anyMatch("chat.type.text"::equals)) {
             String chatMessage = StringUtils.normalizeSpace(packet.getChatMessage());
             String playerName = this.player.getName().asString();
 
