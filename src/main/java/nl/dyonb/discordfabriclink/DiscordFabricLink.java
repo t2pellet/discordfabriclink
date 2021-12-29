@@ -15,7 +15,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.MessageType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.LiteralText;
-import nl.dyonb.discordfabriclink.util.ChatHistoryInteraction;
 import nl.dyonb.discordfabriclink.util.DiscordFabricLinkConfig;
 import nl.dyonb.discordfabriclink.util.DiscordMessage;
 import org.apache.logging.log4j.Level;
@@ -42,32 +41,37 @@ public class DiscordFabricLink implements DedicatedServerModInitializer {
     public void onInitializeServer() {
         DiscordFabricLinkConfig.initialize();
 
-        LOGGER.log(Level.INFO, "Waiting for Discord4J to login");
-        this.initializeD4J();
-        chatToDiscordThread.start();
-        LOGGER.log(Level.INFO, "Discord4J logged in!");
+        try {
+            LOGGER.log(Level.INFO, "Waiting for Discord4J to login");
+            this.initializeD4J();
+            chatToDiscordThread.start();
+            LOGGER.log(Level.INFO, "Discord4J logged in!");
 
-        if (FabricLoader.getInstance().isModLoaded("chathistory")) {
-            LOGGER.log(Level.INFO, "Detected the Chat History mod!");
+            if (FabricLoader.getInstance().isModLoaded("chathistory")) {
+                LOGGER.log(Level.INFO, "Detected the Chat History mod!");
+            }
+
+            // Ignore this c:
+            ServerLifecycleEvents.SERVER_STARTING.register(minecraftServer -> {
+                this.minecraftServer = minecraftServer;
+                chatToDiscordThread.addMessage(new DiscordMessage(Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId), "Server starting"));
+            });
+            ServerLifecycleEvents.SERVER_STARTED.register(minecraftServer -> {
+                chatToDiscordThread.addMessage(new DiscordMessage(Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId), "Server started"));
+            });
+            ServerLifecycleEvents.SERVER_STOPPING.register(minecraftServer -> {
+                chatToDiscordThread.addMessage(new DiscordMessage(Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId), "Server stopping"));
+            });
+            ServerLifecycleEvents.SERVER_STOPPED.register(minecraftServer -> {
+                // Don't use the separate thread to send this message, Otherwise the message won't get sent.
+                new DiscordMessage(Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId), "Server stopped").send();
+                chatToDiscordThread.interrupt();
+                client.logout().block();
+            });
+        } catch (Exception ex) {
+            LOGGER.error("Failed to setup discord bot");
+            ex.printStackTrace();
         }
-
-        // Ignore this c:
-        ServerLifecycleEvents.SERVER_STARTING.register(minecraftServer -> {
-            this.minecraftServer = minecraftServer;
-            chatToDiscordThread.addMessage(new DiscordMessage(Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId), "Server starting"));
-        });
-        ServerLifecycleEvents.SERVER_STARTED.register(minecraftServer -> {
-            chatToDiscordThread.addMessage(new DiscordMessage(Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId), "Server started"));
-        });
-        ServerLifecycleEvents.SERVER_STOPPING.register(minecraftServer -> {
-            chatToDiscordThread.addMessage(new DiscordMessage(Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId), "Server stopping"));
-        });
-        ServerLifecycleEvents.SERVER_STOPPED.register(minecraftServer -> {
-            // Don't use the separate thread to send this message, Otherwise the message won't get sent.
-            new DiscordMessage(Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId), "Server stopped").send();
-            chatToDiscordThread.interrupt();
-            client.logout().block();
-        });
     }
 
     public void initializeD4JWebhooks() {
@@ -113,11 +117,7 @@ public class DiscordFabricLink implements DedicatedServerModInitializer {
 
                     String formattedString = String.format(DiscordFabricLinkConfig.CONFIG.minecraftChatFormat, message.getAuthor().get().getUsername(), message.getContent());
                     LiteralText literalText = new LiteralText(formattedString);
-                    DiscordFabricLink.minecraftServer.getPlayerManager().broadcastChatMessage(literalText, MessageType.CHAT, UUID.randomUUID());
-
-                    if (FabricLoader.getInstance().isModLoaded("chathistory")) {
-                        ChatHistoryInteraction.addMessage(literalText, UUID.randomUUID());
-                    }
+                    DiscordFabricLink.minecraftServer.getPlayerManager().broadcast(literalText, MessageType.CHAT, UUID.randomUUID());
                 });
 
         client.onDisconnect();
