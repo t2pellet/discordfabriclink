@@ -23,7 +23,7 @@ public class DiscordEmbed implements BaseMessage {
     public void send() {
         var author = EmbedAuthorData.builder()
                 .name(message)
-                .iconUrl(String.format(DiscordFabricLinkConfig.CONFIG.uuidFaceApi, this.uuid.toString()))
+                .iconUrl(DiscordFabricLinkConfig.CONFIG.getUuidUrl(this.uuid))
                 .build();
         var data = EmbedData.builder()
                 .author(author)

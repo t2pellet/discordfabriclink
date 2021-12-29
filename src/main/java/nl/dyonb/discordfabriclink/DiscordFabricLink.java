@@ -7,6 +7,8 @@ import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.TextChannel;
+import discord4j.core.spec.EmbedCreateFields;
+import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.WebhookData;
 import discord4j.rest.util.Image;
 import net.fabricmc.api.DedicatedServerModInitializer;
@@ -116,11 +118,17 @@ public class DiscordFabricLink implements DedicatedServerModInitializer {
                 .subscribe(message -> {
                     if (message.getContent().toLowerCase().startsWith("!status")) {
                         message.getChannel().block().createMessage("Players online: " + DiscordFabricLink.minecraftServer.getCurrentPlayerCount()).block();
+                        DiscordFabricLink.minecraftServer.getPlayerManager().getPlayerList().forEach(player -> {
+                            var embed = EmbedCreateSpec.builder()
+                                            .author(EmbedCreateFields.Author.of(player.getName().getString(), null, DiscordFabricLinkConfig.CONFIG.getUuidUrl(player.getUuid())))
+                                            .build();
+                            message.getChannel().block().createMessage(embed).block();
+                        });
+                    } else {
+                        String formattedString = String.format(DiscordFabricLinkConfig.CONFIG.minecraftChatFormat, message.getAuthor().get().getUsername(), message.getContent());
+                        LiteralText literalText = new LiteralText(formattedString);
+                        DiscordFabricLink.minecraftServer.getPlayerManager().broadcast(literalText, MessageType.CHAT, UUID.randomUUID());
                     }
-
-                    String formattedString = String.format(DiscordFabricLinkConfig.CONFIG.minecraftChatFormat, message.getAuthor().get().getUsername(), message.getContent());
-                    LiteralText literalText = new LiteralText(formattedString);
-                    DiscordFabricLink.minecraftServer.getPlayerManager().broadcast(literalText, MessageType.CHAT, UUID.randomUUID());
                 });
 
         client.onDisconnect();

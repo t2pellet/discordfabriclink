@@ -9,6 +9,7 @@ import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 import nl.dyonb.discordfabriclink.DiscordFabricLink;
 
 import java.util.List;
+import java.util.UUID;
 
 @Config(name = DiscordFabricLink.MOD_ID)
 public class DiscordFabricLinkConfig implements ConfigData {
@@ -42,6 +43,10 @@ public class DiscordFabricLinkConfig implements ConfigData {
 
     @Comment("UUID face API")
     public String uuidFaceApi = "https://crafatar.com/avatars/%s?overlay&size=128";
+
+    public String getUuidUrl(UUID uuid) {
+        return String.format(DiscordFabricLinkConfig.CONFIG.uuidFaceApi, uuid.toString());
+    }
 
     public static void initialize() {
         AutoConfig.register(DiscordFabricLinkConfig.class, JanksonConfigSerializer::new);
