@@ -1,7 +1,6 @@
 package nl.dyonb.discordfabriclink.mixin;
 
 import discord4j.common.util.Snowflake;
-import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.server.filter.TextStream;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -15,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Arrays;
+import java.util.List;
 
 @Mixin(ServerPlayNetworkHandler.class)
 public class ServerPlayNetworkHandlerMixin {
@@ -24,13 +23,12 @@ public class ServerPlayNetworkHandlerMixin {
 
     @Inject(at = @At(value = "HEAD", target = "Lnet/minecraft/server/MinecraftServer;getPlayerManager()Lnet/minecraft/server/PlayerManager"), method = "handleMessage")
     public void onGameMessage(TextStream.Message message, CallbackInfo ci) {
-        boolean sendMessage = true;
         String messageText = message.getRaw();
-        if (messageText.startsWith("/") && !DiscordFabricLinkConfig.CONFIG.sendAdminCommands) {
-            sendMessage = false;
+        if (messageText.startsWith("/")) {
+            return;
         }
         
-        if (sendMessage && Arrays.stream(DiscordFabricLinkConfig.CONFIG.publicKeys).anyMatch("chat.type.text"::equals)) {
+        if (DiscordFabricLinkConfig.CONFIG.chatKeys.contains("chat.type.text")) {
             String chatMessage = StringUtils.normalizeSpace(messageText);
             String playerName = this.player.getName().asString();
 

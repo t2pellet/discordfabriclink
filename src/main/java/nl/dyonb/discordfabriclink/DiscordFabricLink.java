@@ -11,11 +11,9 @@ import discord4j.discordjson.json.WebhookData;
 import discord4j.rest.util.Image;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.MessageType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.LiteralText;
-import nl.dyonb.discordfabriclink.util.DiscordEmbed;
 import nl.dyonb.discordfabriclink.util.DiscordFabricLinkConfig;
 import nl.dyonb.discordfabriclink.util.DiscordMessage;
 import org.apache.logging.log4j.Level;
@@ -50,14 +48,22 @@ public class DiscordFabricLink implements DedicatedServerModInitializer {
 
             Snowflake snowflake = Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId);
             ServerLifecycleEvents.SERVER_STARTING.register(minecraftServer -> {
-                this.minecraftServer = minecraftServer;
+                DiscordFabricLink.minecraftServer = minecraftServer;
             });
             ServerLifecycleEvents.SERVER_STARTED.register(minecraftServer -> {
-                chatToDiscordThread.addMessage(new DiscordMessage(snowflake, ":white_check_mark: **Server started**"));
+                var msg = ":white_check_mark: **Server started**";
+                chatToDiscordThread.addMessage(new DiscordMessage(snowflake, msg));
+                if (!DiscordFabricLinkConfig.CONFIG.logChannelId.isEmpty()) {
+                    chatToDiscordThread.addMessage(new DiscordMessage(Snowflake.of(DiscordFabricLinkConfig.CONFIG.logChannelId), msg));
+                }
             });
             ServerLifecycleEvents.SERVER_STOPPED.register(minecraftServer -> {
                 // Don't use the separate thread to send this message, Otherwise the message won't get sent.
-                new DiscordMessage(snowflake, ":octagonal_sign: **Server stopped**").send();
+                var msg = ":octagonal_sign: **Server stopped**";
+                new DiscordMessage(snowflake, msg).send();
+                if (!DiscordFabricLinkConfig.CONFIG.logChannelId.isEmpty()) {
+                    new DiscordMessage(Snowflake.of(DiscordFabricLinkConfig.CONFIG.logChannelId), msg).send();
+                }
                 chatToDiscordThread.interrupt();
                 client.logout().block();
             });
@@ -69,19 +75,23 @@ public class DiscordFabricLink implements DedicatedServerModInitializer {
 
     public void initializeD4JWebhooks() {
         // Make a list of webhooks
-        List<WebhookData> list = this.client.getChannelById(Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId)).block().getRestChannel().getWebhooks().collectList().block();
-        List<String> webhookNameList = new ArrayList<String>();
-        list.forEach(webhookData -> {
-            webhookNameList.add(webhookData.name().get().toLowerCase());
-        });
+        String[] channelIds = {DiscordFabricLinkConfig.CONFIG.chatChannelId, DiscordFabricLinkConfig.CONFIG.logChannelId};
+        for (var channelId : channelIds) {
+            if (channelId.isEmpty()) continue;
+            List<WebhookData> list = client.getChannelById(Snowflake.of(channelId)).block().getRestChannel().getWebhooks().collectList().block();
+            List<String> webhookNameList = new ArrayList<>();
+            list.forEach(webhookData -> {
+                webhookNameList.add(webhookData.name().get().toLowerCase());
+            });
 
-        // Create the webhook if it doesn't exist
-        if (!webhookNameList.contains(DiscordFabricLinkConfig.CONFIG.webhookName.toLowerCase())) {
-            TextChannel textChannel = (TextChannel) this.client.getChannelById(Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId)).block();
-            textChannel.createWebhook(webhookCreateSpec -> {
-                webhookCreateSpec.setName(DiscordFabricLinkConfig.CONFIG.webhookName)
-                        .setAvatar(Image.ofUrl(String.format(DiscordFabricLinkConfig.CONFIG.uuidFaceApi, UUID.randomUUID())).block());
-            }).block();
+            // Create the webhook if it doesn't exist
+            if (!webhookNameList.contains(DiscordFabricLinkConfig.CONFIG.webhookName.toLowerCase())) {
+                TextChannel textChannel = (TextChannel) client.getChannelById(Snowflake.of(channelId)).block();
+                textChannel.createWebhook(webhookCreateSpec -> {
+                    webhookCreateSpec.setName(DiscordFabricLinkConfig.CONFIG.webhookName)
+                            .setAvatar(Image.ofUrl(String.format(DiscordFabricLinkConfig.CONFIG.uuidFaceApi, UUID.randomUUID())).block());
+                }).block();
+            }
         }
     }
 
