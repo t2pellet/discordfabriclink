@@ -7,8 +7,6 @@ import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.TextChannel;
-import discord4j.core.spec.EmbedCreateFields;
-import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.json.WebhookData;
 import discord4j.rest.util.Image;
 import net.fabricmc.api.DedicatedServerModInitializer;
@@ -16,8 +14,10 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.network.MessageType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.LiteralText;
-import nl.dyonb.discordfabriclink.util.DiscordFabricLinkConfig;
-import nl.dyonb.discordfabriclink.util.DiscordMessage;
+import nl.dyonb.discordfabriclink.command.CommandRegistry;
+import nl.dyonb.discordfabriclink.command.StatusCommand;
+import nl.dyonb.discordfabriclink.config.DiscordFabricLinkConfig;
+import nl.dyonb.discordfabriclink.message.DiscordMessage;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -105,30 +105,30 @@ public class DiscordFabricLink implements DedicatedServerModInitializer {
 
         this.initializeD4JWebhooks();
 
+        // Log when ready
         client.getEventDispatcher().on(ReadyEvent.class)
                 .subscribe(event -> {
                     User self = event.getSelf();
                     DiscordFabricLink.LOGGER.log(Level.INFO, String.format("Logged in as %s#%s", self.getUsername(), self.getDiscriminator()));
                 });
 
+        // Register commands
+        CommandRegistry.getInstance().register(
+                new StatusCommand()
+        );
+
+        // Setup messaging disc -> game
         client.getEventDispatcher().on(MessageCreateEvent.class)
                 .map(MessageCreateEvent::getMessage)
-                .filter(message -> message.getAuthor().map(user -> !user.isBot()).orElse(false))
-                .filter(message -> message.getChannelId().equals(Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId)))
+                .filter(message -> {
+                    return !message.getAuthor().get().isBot()
+                            && message.getChannelId().equals(Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId))
+                            && !CommandRegistry.getInstance().isPrefix(message.getContent());
+                })
                 .subscribe(message -> {
-                    if (message.getContent().toLowerCase().startsWith("!status")) {
-                        message.getChannel().block().createMessage("Players online: " + DiscordFabricLink.minecraftServer.getCurrentPlayerCount()).block();
-                        DiscordFabricLink.minecraftServer.getPlayerManager().getPlayerList().forEach(player -> {
-                            var embed = EmbedCreateSpec.builder()
-                                            .author(EmbedCreateFields.Author.of(player.getName().getString(), null, DiscordFabricLinkConfig.CONFIG.getUuidUrl(player.getUuid())))
-                                            .build();
-                            message.getChannel().block().createMessage(embed).block();
-                        });
-                    } else {
-                        String formattedString = String.format(DiscordFabricLinkConfig.CONFIG.minecraftChatFormat, message.getAuthor().get().getUsername(), message.getContent());
-                        LiteralText literalText = new LiteralText(formattedString);
-                        DiscordFabricLink.minecraftServer.getPlayerManager().broadcast(literalText, MessageType.CHAT, UUID.randomUUID());
-                    }
+                    String formattedString = String.format(DiscordFabricLinkConfig.CONFIG.minecraftChatFormat, message.getAuthor().get().getUsername(), message.getContent());
+                    LiteralText literalText = new LiteralText(formattedString);
+                    DiscordFabricLink.minecraftServer.getPlayerManager().broadcast(literalText, MessageType.CHAT, UUID.randomUUID());
                 });
 
         client.onDisconnect();

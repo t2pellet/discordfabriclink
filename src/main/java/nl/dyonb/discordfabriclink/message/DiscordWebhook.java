@@ -1,9 +1,10 @@
-package nl.dyonb.discordfabriclink.util;
+package nl.dyonb.discordfabriclink.message;
 
 import discord4j.common.util.Snowflake;
 import discord4j.discordjson.json.WebhookData;
 import discord4j.rest.util.AllowedMentions;
 import nl.dyonb.discordfabriclink.DiscordFabricLink;
+import nl.dyonb.discordfabriclink.config.DiscordFabricLinkConfig;
 
 import java.util.UUID;
 

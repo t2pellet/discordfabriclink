@@ -1,4 +1,4 @@
-package nl.dyonb.discordfabriclink.util;
+package nl.dyonb.discordfabriclink.message;
 
 import discord4j.common.util.Snowflake;
 import nl.dyonb.discordfabriclink.DiscordFabricLink;

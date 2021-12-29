@@ -1,4 +1,4 @@
-package nl.dyonb.discordfabriclink.util;
+package nl.dyonb.discordfabriclink.message;
 
 public interface BaseMessage {
 

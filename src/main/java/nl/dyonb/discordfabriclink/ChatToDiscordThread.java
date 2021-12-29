@@ -1,6 +1,6 @@
 package nl.dyonb.discordfabriclink;
 
-import nl.dyonb.discordfabriclink.util.BaseMessage;
+import nl.dyonb.discordfabriclink.message.BaseMessage;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
