@@ -34,7 +34,7 @@ public abstract class MinecraftServerMixin {
             }
 
             // Send to chat
-            if (DiscordFabricLinkConfig.CONFIG.chatKeys.contains(key) && !key.startsWith("chat.type.text")) {
+            if (!DiscordFabricLinkConfig.CONFIG.chatChannelId.isEmpty() && DiscordFabricLinkConfig.CONFIG.chatKeys.contains(key) && !key.startsWith("chat.type.text")) {
                 String discordMessage = message.getString();
                 MinecraftServer server = (MinecraftServer) ((Object) this);
                 String name = discordMessage.substring(0, discordMessage.indexOf(' '));
@@ -50,7 +50,7 @@ public abstract class MinecraftServerMixin {
                 String name = discordMessage.substring(0, discordMessage.indexOf(' '));
                 PlayerEntity player = server.getPlayerManager().getPlayer(name);
                 if (player != null) {
-                    DiscordFabricLink.chatToDiscordThread.addMessage(new DiscordEmbed(Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId), discordMessage, player.getUuid()));
+                    DiscordFabricLink.chatToDiscordThread.addMessage(new DiscordEmbed(Snowflake.of(DiscordFabricLinkConfig.CONFIG.logChannelId), discordMessage, player.getUuid()));
                 }  else {
                     DiscordFabricLink.chatToDiscordThread.addMessage(new DiscordMessage(Snowflake.of(DiscordFabricLinkConfig.CONFIG.logChannelId), discordMessage));
                 }

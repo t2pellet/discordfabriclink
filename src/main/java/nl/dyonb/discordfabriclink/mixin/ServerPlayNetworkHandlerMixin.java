@@ -26,7 +26,7 @@ public class ServerPlayNetworkHandlerMixin {
             return;
         }
         
-        if (DiscordFabricLinkConfig.CONFIG.chatKeys.contains("chat.type.text")) {
+        if (!DiscordFabricLinkConfig.CONFIG.chatChannelId.isEmpty() && DiscordFabricLinkConfig.CONFIG.chatKeys.contains("chat.type.text")) {
             String chatMessage = StringUtils.normalizeSpace(messageText);
             String playerName = this.player.getName().asString();
 

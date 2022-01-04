@@ -41,37 +41,40 @@ public class DiscordFabricLink implements DedicatedServerModInitializer {
     @Override
     public void onInitializeServer() {
         DiscordFabricLinkConfig.initialize();
+        LOGGER.log(Level.INFO, "Waiting for Discord4J to login");
+        this.initializeD4J();
+        chatToDiscordThread.start();
+        LOGGER.log(Level.INFO, "Discord4J logged in!");
 
-        try {
-            LOGGER.log(Level.INFO, "Waiting for Discord4J to login");
-            this.initializeD4J();
-            chatToDiscordThread.start();
-            LOGGER.log(Level.INFO, "Discord4J logged in!");
-
-            Snowflake snowflake = Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId);
-            ServerLifecycleEvents.SERVER_STARTING.register(minecraftServer -> {
-                DiscordFabricLink.minecraftServer = minecraftServer;
-            });
-            ServerLifecycleEvents.SERVER_STARTED.register(minecraftServer -> {
-                var msg = ":white_check_mark: **Server started**";
-                chatToDiscordThread.addMessage(new DiscordMessage(snowflake, msg));
-                if (!DiscordFabricLinkConfig.CONFIG.logChannelId.isEmpty()) {
-                    chatToDiscordThread.addMessage(new DiscordMessage(Snowflake.of(DiscordFabricLinkConfig.CONFIG.logChannelId), msg));
-                }
-            });
-            ServerLifecycleEvents.SERVER_STOPPED.register(minecraftServer -> {
-                // Don't use the separate thread to send this message, Otherwise the message won't get sent.
-                var msg = ":octagonal_sign: **Server stopped**";
-                new DiscordMessage(snowflake, msg).send();
-                if (!DiscordFabricLinkConfig.CONFIG.logChannelId.isEmpty()) {
-                    new DiscordMessage(Snowflake.of(DiscordFabricLinkConfig.CONFIG.logChannelId), msg).send();
-                }
-                chatToDiscordThread.interrupt();
-                client.logout().block();
-            });
-        } catch (Exception ex) {
-            LOGGER.error("Failed to setup discord bot");
-            ex.printStackTrace();
+        if (!DiscordFabricLinkConfig.CONFIG.chatChannelId.isEmpty()) {
+            try {
+                Snowflake snowflake = Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId);
+                ServerLifecycleEvents.SERVER_STARTING.register(minecraftServer -> {
+                    DiscordFabricLink.minecraftServer = minecraftServer;
+                });
+                ServerLifecycleEvents.SERVER_STARTED.register(minecraftServer -> {
+                    var msg = ":white_check_mark: **Server started**";
+                    chatToDiscordThread.addMessage(new DiscordMessage(snowflake, msg));
+                    if (!DiscordFabricLinkConfig.CONFIG.logChannelId.isEmpty()) {
+                        chatToDiscordThread.addMessage(new DiscordMessage(Snowflake.of(DiscordFabricLinkConfig.CONFIG.logChannelId), msg));
+                    }
+                });
+                ServerLifecycleEvents.SERVER_STOPPED.register(minecraftServer -> {
+                    // Don't use the separate thread to send this message, Otherwise the message won't get sent.
+                    var msg = ":octagonal_sign: **Server stopped**";
+                    new DiscordMessage(snowflake, msg).send();
+                    if (!DiscordFabricLinkConfig.CONFIG.logChannelId.isEmpty()) {
+                        new DiscordMessage(Snowflake.of(DiscordFabricLinkConfig.CONFIG.logChannelId), msg).send();
+                    }
+                    chatToDiscordThread.interrupt();
+                    client.logout().block();
+                });
+            } catch (Exception ex) {
+                LOGGER.error("Failed to setup discord bot");
+                ex.printStackTrace();
+            }
+        } else {
+            LOGGER.error("Cannot attach discord bot, since the chat channel ID is empty");
         }
     }
 

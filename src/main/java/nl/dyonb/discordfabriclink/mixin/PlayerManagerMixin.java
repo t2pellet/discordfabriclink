@@ -18,7 +18,7 @@ public class PlayerManagerMixin {
     // Handle joining separately from other system mesages in MinecraftServerMixin, because we can't get the UUID for a joining player from MinecraftServer::addSystemMessage
     @Inject(at = @At("RETURN"), method = "onPlayerConnect")
     private void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player, CallbackInfo info) {
-        if (DiscordFabricLinkConfig.CONFIG.chatKeys.contains("multiplayer")) {
+        if (!DiscordFabricLinkConfig.CONFIG.chatChannelId.isEmpty() && DiscordFabricLinkConfig.CONFIG.chatKeys.contains("multiplayer")) {
             sendJoinMsg(player, DiscordFabricLinkConfig.CONFIG.chatChannelId);
         }
         if (!DiscordFabricLinkConfig.CONFIG.logChannelId.isEmpty() && DiscordFabricLinkConfig.CONFIG.logKeys.contains("multiplayer")) {
