@@ -124,7 +124,8 @@ public class DiscordFabricLink implements DedicatedServerModInitializer {
         client.getEventDispatcher().on(MessageCreateEvent.class)
                 .map(MessageCreateEvent::getMessage)
                 .filter(message -> {
-                    return !message.getAuthor().get().isBot()
+                    return message.getAuthor().isPresent()
+                            && !message.getAuthor().get().isBot()
                             && message.getChannelId().equals(Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId))
                             && !CommandRegistry.getInstance().isPrefix(message.getContent());
                 })

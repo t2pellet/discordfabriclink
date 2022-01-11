@@ -1,12 +1,13 @@
 {
   "schemaVersion": 1,
-  "id": "gamocosm",
+  "id": "discordchat",
   "version": "${version}",
 
   "name": "Discord Fabric Link",
   "description": "Links Fabric Server to Discord Chat!",
   "authors": [
-    "CommodoreThrawn"
+    "CommodoreThrawn",
+    "namebee"
   ],
   "contact": {
     "sources": "https://github.com/t2pellet/discordfabriclink"

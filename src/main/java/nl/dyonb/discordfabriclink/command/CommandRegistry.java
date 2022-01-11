@@ -44,7 +44,8 @@ public class CommandRegistry {
         DiscordFabricLink.client.getEventDispatcher().on(MessageCreateEvent.class)
                 .map(MessageCreateEvent::getMessage)
                 .filter(message -> {
-                    return !message.getAuthor().get().isBot()
+                    return message.getAuthor().isPresent()
+                            && !message.getAuthor().get().isBot()
                             && message.getChannelId().equals(Snowflake.of(command.channelId()))
                             && message.getContent().toLowerCase().equals(command.commandString());
                 })

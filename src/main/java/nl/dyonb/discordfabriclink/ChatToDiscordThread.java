@@ -16,7 +16,7 @@ public class ChatToDiscordThread extends Thread {
                 blockingQueue.take().send();
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            DiscordFabricLink.LOGGER.error("Chat to Discord Thread Interrupted. Server stopping?");
         }
     }
 
