@@ -2,17 +2,10 @@ package nl.dyonb.discordfabriclink.command;
 
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.spec.EmbedCreateFields;
-import discord4j.core.spec.EmbedCreateSpec;
-import net.fabricmc.fabric.api.event.Event;
-import net.minecraft.network.MessageType;
-import net.minecraft.text.LiteralText;
 import nl.dyonb.discordfabriclink.DiscordFabricLink;
-import nl.dyonb.discordfabriclink.config.DiscordFabricLinkConfig;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class CommandRegistry {
 

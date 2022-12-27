@@ -7,7 +7,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class ChatToDiscordThread extends Thread {
 
-    private BlockingQueue<BaseMessage> blockingQueue = new LinkedBlockingQueue();
+    private final BlockingQueue<BaseMessage> blockingQueue = new LinkedBlockingQueue<>();
 
     @Override
     public void run() {

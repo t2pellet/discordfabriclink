@@ -6,7 +6,6 @@
   "mixins": [
   ],
   "server": [
-    "MinecraftServerMixin",
     "ServerPlayNetworkHandlerMixin",
     "PlayerManagerMixin"
   ],

@@ -1,6 +1,7 @@
 package nl.dyonb.discordfabriclink.mixin;
 
 import discord4j.common.util.Snowflake;
+import net.minecraft.network.message.SignedMessage;
 import net.minecraft.server.filter.TextStream;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -19,16 +20,16 @@ public class ServerPlayNetworkHandlerMixin {
 
     @Shadow public ServerPlayerEntity player;
 
-    @Inject(at = @At(value = "HEAD", target = "Lnet/minecraft/server/MinecraftServer;getPlayerManager()Lnet/minecraft/server/PlayerManager"), method = "handleMessage")
-    public void onGameMessage(TextStream.Message message, CallbackInfo ci) {
-        String messageText = message.getRaw();
+    @Inject(at = @At(value = "HEAD", target = "Lnet/minecraft/server/MinecraftServer;getPlayerManager()Lnet/minecraft/server/PlayerManager"), method = "handleDecoratedMessage")
+    public void onGameMessage(SignedMessage message, CallbackInfo ci) {
+        String messageText = message.getContent().getString();
         if (messageText.startsWith("/")) {
             return;
         }
         
         if (!DiscordFabricLinkConfig.CONFIG.chatChannelId.isEmpty() && DiscordFabricLinkConfig.CONFIG.chatKeys.contains("chat.type.text")) {
             String chatMessage = StringUtils.normalizeSpace(messageText);
-            String playerName = this.player.getName().asString();
+            String playerName = this.player.getName().getString();
 
             DiscordWebhook discordWebhook = new DiscordWebhook(Snowflake.of(DiscordFabricLinkConfig.CONFIG.chatChannelId), chatMessage, playerName, this.player.getUuid());
             DiscordFabricLink.chatToDiscordThread.addMessage(discordWebhook);

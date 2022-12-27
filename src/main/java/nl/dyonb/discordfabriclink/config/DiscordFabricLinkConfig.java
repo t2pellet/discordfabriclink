@@ -36,7 +36,7 @@ public class DiscordFabricLinkConfig implements ConfigData {
     public boolean shouldLogKeys = false;
 
     @Comment("Webhook name")
-    public String webhookName = "Discord Fabric Link";
+    public String webhookName = "MC Fabric Link";
 
     @Comment("The format to use in the Minecraft chat")
     public String minecraftChatFormat = "[%s] %s";

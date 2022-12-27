@@ -11,9 +11,8 @@ import discord4j.discordjson.json.WebhookData;
 import discord4j.rest.util.Image;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.minecraft.network.MessageType;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import nl.dyonb.discordfabriclink.command.CommandRegistry;
 import nl.dyonb.discordfabriclink.command.StatusCommand;
 import nl.dyonb.discordfabriclink.config.DiscordFabricLinkConfig;
@@ -131,8 +130,8 @@ public class DiscordFabricLink implements DedicatedServerModInitializer {
                 })
                 .subscribe(message -> {
                     String formattedString = String.format(DiscordFabricLinkConfig.CONFIG.minecraftChatFormat, message.getAuthor().get().getUsername(), message.getContent());
-                    LiteralText literalText = new LiteralText(formattedString);
-                    DiscordFabricLink.minecraftServer.getPlayerManager().broadcast(literalText, MessageType.CHAT, UUID.randomUUID());
+                    Text text = Text.literal(formattedString);
+                    DiscordFabricLink.minecraftServer.getPlayerManager().broadcast(text, false);
                 });
 
         client.onDisconnect();
